@@ -9,6 +9,7 @@ public class CharacterAnimator : MonoBehaviour
 
     private void Update()
     {
+
         if (DPadPosition.x == -1)
         {
             m_Animator.SetInteger("SwordAngle", -40);
@@ -39,6 +40,24 @@ public class CharacterAnimator : MonoBehaviour
         {
             m_Animator.SetInteger("SwordAngle", -1);
             SetCombatTargetCue(-1);
+        }
+
+        if (PlayerInput.BasicAttack)
+        {
+            m_Animator.SetBool("Attacking", true);
+        }
+        else
+        {
+            m_Animator.SetBool("Attacking", false);
+        }
+
+        if (PlayerInput.JoystickPosition.sqrMagnitude == 0)
+        {
+            m_Animator.SetBool("Walking", false);
+        }
+        else
+        {
+            m_Animator.SetBool("Walking", true);
         }
     }
 
@@ -96,6 +115,14 @@ public static class PlayerInput
         {
             var pos = new Vector2(Input.GetAxisRaw("DPadX"), Input.GetAxisRaw("DPadY"));
             return pos;
+        }
+    }
+
+    public static bool BasicAttack
+    {
+        get
+        {
+            return Input.GetButton("Fire1");
         }
     }
 }

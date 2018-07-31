@@ -2,77 +2,47 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[System.Serializable]
-public class AngleOffsets
-{
-    public float angle = 0;
-    public Vector3 offset;
-}
-
 [ExecuteInEditMode]
 public class CameraFollow : MonoBehaviour
 {
     public Transform m_Target;
-    public float forwardDistance = 3;
-    public float height = 15;
-    public Vector3 offset;
-    public float angle = 10;
-    public bool facingLeft = false;
-    public bool facingUp = true;
 
-    public List<AngleOffsets> m_Angles;
-    
+    public float offsetDistance;
+    public float height = 5;
+    public float zOffset = -4;
+
+    public float dotProduct;
     private void Update()
     {
         if (m_Target == null) return;
 
-        var position = m_Target.transform.position;
+        var aimPosition = m_Target.position - m_Target.forward * offsetDistance;
+
+        dotProduct = Quaternion.Dot(Quaternion.identity, m_Target.rotation);
+        if (dotProduct <= 0.6F)
+        {
+            aimPosition = m_Target.position + m_Target.forward * offsetDistance;
+        }
+
+
+        var frontPosition = m_Target.position + m_Target.forward * offsetDistance;
+
+        var position = aimPosition;
+
         position.y += height;
-        position += offset;
+        position.z += zOffset;
 
-        if (facingLeft)
-            position += m_Angles[0].offset;
-        else
-            position += m_Angles[1].offset;
+       
+        transform.position = Vector3.Lerp(transform.position,position,1 * Time.deltaTime);
+        var rot = Quaternion.LookRotation(frontPosition - transform.position);
+        transform.rotation = Quaternion.Lerp(transform.rotation, rot, 1 * Time.deltaTime);
 
-        transform.position = Vector3.Lerp(transform.position,position,5 * Time.deltaTime);
-        UpdateCamera();
-    }
-
-    private void UpdateCamera()
-    {
-        if (Joystick.x == -1)
+        if (!Application.isPlaying)
         {
-            var a = new Vector3(25, -angle, 0);
-            var q = Quaternion.identity * Quaternion.Euler(a);
-            transform.localRotation = Quaternion.Lerp(transform.localRotation,q,3 * Time.deltaTime);
-            facingLeft = true;
+            transform.position = position;
+            transform.rotation = rot;
         }
 
-
-        if (Joystick.x == 1)
-        {
-            var a = new Vector3(25, angle, 0);
-            var q = Quaternion.identity * Quaternion.Euler(a);
-            transform.localRotation = Quaternion.Lerp(transform.localRotation, q, 3 * Time.deltaTime);
-            facingLeft = false;
-        }
-
-
-        if (Joystick.y == -1)
-        {
-
-        }
-
-        if (Joystick.y == 1)
-        {
-            facingUp = true;
-        }
-
-        if (Joystick.sqrMagnitude == 0)
-        {
-            //transform.localEulerAngles = new Vector3(transform.localEulerAngles.x, 0, 0);
-        }
     }
 
     public Vector2 Joystick
@@ -82,4 +52,11 @@ public class CameraFollow : MonoBehaviour
             return PlayerInput.JoystickPosition;
         }
     }
+
+    private void OnDrawGizmos()
+    {
+        var aimPosition = m_Target.position - m_Target.forward * offsetDistance;
+        Gizmos.DrawLine(m_Target.position, aimPosition);
+    }
+
 }
