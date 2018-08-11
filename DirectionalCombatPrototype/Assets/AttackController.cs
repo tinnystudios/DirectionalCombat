@@ -7,11 +7,13 @@ public class AttackController : MonoBehaviour
     public LayerMask m_LayerMask;
     public float range = 1;
     public float size = 1;
+    public float height;
+
     public Vector3 FrontPosition
     {
         get
         {
-            return transform.position + (transform.forward * size/2) + (transform.up);
+            return transform.position + (transform.forward * size/2) + (transform.up * height);
         }
     }
 
@@ -28,6 +30,9 @@ public class AttackController : MonoBehaviour
             if (iDamagable != null)
             {
                 Debug.Log("Hit: " + enemyHit.collider.name);
+
+                var flick = enemyHit.transform.GetComponentInChildren<IFlicker<Color>>();
+                if (flick != null) flick.Flicker(Color.red);
             }
         }
     }

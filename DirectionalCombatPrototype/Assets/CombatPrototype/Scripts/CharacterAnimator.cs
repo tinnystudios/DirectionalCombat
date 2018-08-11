@@ -46,7 +46,7 @@ public class CharacterAnimator : MonoBehaviour
         if (AimDirection.sqrMagnitude == 0)
         {
             m_Animator.SetInteger("SwordAngle", -1);
-            SetCombatTargetCue(-1);
+            SetCombatTargetCue(4);
         }
 
     }
@@ -90,6 +90,7 @@ public class CharacterAnimator : MonoBehaviour
 
     public void SetCombatTargetCue(int index)
     {
+        
         for (int i = 0; i < m_Targets.Count; i++)
         {
             if (i == index)

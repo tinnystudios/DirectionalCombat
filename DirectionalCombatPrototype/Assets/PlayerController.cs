@@ -55,7 +55,7 @@ public class PlayerController : MonoBehaviour
     IEnumerator Nudge()
     {
         yield return new WaitForSeconds(0.2F);
-        NudgeForward(1);
+        //NudgeForward(1);
     }
 
     public void NudgeForward(float amount)
