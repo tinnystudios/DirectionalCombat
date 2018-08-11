@@ -12,6 +12,9 @@ public class CameraFollow : MonoBehaviour
     public float zOffset = -4;
 
     public float dotProduct;
+
+    public float posSpeed = 2;
+    public float rotSpeed = 2;
     private void Update()
     {
         if (m_Target == null) return;
@@ -33,9 +36,9 @@ public class CameraFollow : MonoBehaviour
         position.z += zOffset;
 
        
-        transform.position = Vector3.Lerp(transform.position,position,1 * Time.deltaTime);
+        transform.position = Vector3.Lerp(transform.position,position, posSpeed * Time.deltaTime);
         var rot = Quaternion.LookRotation(frontPosition - transform.position);
-        transform.rotation = Quaternion.Lerp(transform.rotation, rot, 1 * Time.deltaTime);
+        transform.rotation = Quaternion.Lerp(transform.rotation, rot, rotSpeed * Time.deltaTime);
 
         if (!Application.isPlaying)
         {

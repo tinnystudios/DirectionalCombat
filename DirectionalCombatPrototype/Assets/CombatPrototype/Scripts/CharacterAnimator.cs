@@ -5,125 +5,103 @@ using UnityEngine;
 public class CharacterAnimator : MonoBehaviour
 {
     public Animator m_Animator;
-    public List<GameObject> m_TargetCubes;
+    public float m_AnimatorSpeed = 1;
+
+    public List<TargetCube> m_Targets;
+
+    private void Start()
+    {
+        m_Animator.speed = m_AnimatorSpeed;
+    }
 
     private void Update()
     {
 
-        if (DPadPosition.x == -1)
+        if (AimDirection.x == -1)
         {
             m_Animator.SetInteger("SwordAngle", -40);
             SetCombatTargetCue(0);
         }
 
 
-        if (DPadPosition.x == 1)
+        if (AimDirection.x == 1)
         {
             m_Animator.SetInteger("SwordAngle", 40);
             SetCombatTargetCue(2);
         }
 
 
-        if (DPadPosition.y == -1)
+        if (AimDirection.y == -1)
         {
             m_Animator.SetInteger("SwordAngle", 100);
             SetCombatTargetCue(3);
         }
 
-        if (DPadPosition.y == 1)
+        if (AimDirection.y == 1)
         {
             m_Animator.SetInteger("SwordAngle", 0);
             SetCombatTargetCue(1);
         }
 
-        if (DPadPosition.sqrMagnitude == 0)
+        if (AimDirection.sqrMagnitude == 0)
         {
             m_Animator.SetInteger("SwordAngle", -1);
             SetCombatTargetCue(-1);
         }
 
-        if (PlayerInput.BasicAttack)
-        {
-            m_Animator.SetBool("Attacking", true);
-        }
-        else
-        {
-            m_Animator.SetBool("Attacking", false);
-        }
-
-        if (PlayerInput.JoystickPosition.sqrMagnitude == 0)
-        {
-            m_Animator.SetBool("Walking", false);
-        }
-        else
-        {
-            m_Animator.SetBool("Walking", true);
-        }
     }
 
-    public Vector2 DPadPosition
+    public void PlayJump(bool state)
+    {
+        m_Animator.SetTrigger("Jump");
+    }
+
+    public void PlayWalking(bool state, float speed = 1)
+    {
+        m_Animator.SetBool("Walking", state);
+        m_Animator.SetFloat("WalkSpeed", speed);
+    }
+
+    public void BasicAttack(bool state)
+    {
+        m_Animator.SetBool("Attacking", state);
+    }
+
+    public bool IsAttacking
+    {
+        get { return m_Animator.GetBool("Attacking"); }
+    }
+
+    public Vector2 AimDirection
     {
         get
         {
             if (PlayerInput.LastJoystickDirection.y < 0)
             {
-                var newDPAD = PlayerInput.DPadPosition;
-                newDPAD.x = -newDPAD.x;
-                return newDPAD;
+                var newDirection = PlayerInput.JoystickRPosition;
+                newDirection.x = -newDirection.x;
+                return newDirection;
             }
             //If you're facing opposite direction
-            return PlayerInput.DPadPosition;
+            return PlayerInput.JoystickRPosition;
         }
     }
+
 
     public void SetCombatTargetCue(int index)
     {
-        for (int i = 0; i < m_TargetCubes.Count; i++)
+        for (int i = 0; i < m_Targets.Count; i++)
         {
             if (i == index)
             {
-                m_TargetCubes[i].SetActive(true);
+                m_Targets[i].SetActive(true);
             }
             else
             {
-                m_TargetCubes[i].SetActive(false);
+                m_Targets[i].SetActive(false);
             }
         }
     }
 
-}
-
-public static class PlayerInput
-{
-    public static Vector2 LastJoystickDirection;
-
-    public static Vector2 JoystickPosition
-    {
-        get
-        {
-            var pos = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
-
-            if(pos.sqrMagnitude >= 0.2F)
-            LastJoystickDirection = pos;
-            return pos;
-        }
-    }
-
-    public static Vector2 DPadPosition
-    {
-        get
-        {
-            var pos = new Vector2(Input.GetAxisRaw("DPadX"), Input.GetAxisRaw("DPadY"));
-            return pos;
-        }
-    }
-
-    public static bool BasicAttack
-    {
-        get
-        {
-            return Input.GetButton("Fire1");
-        }
-    }
 }
 
