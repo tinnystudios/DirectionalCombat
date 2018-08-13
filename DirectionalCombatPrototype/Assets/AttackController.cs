@@ -2,8 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AttackController : MonoBehaviour
+public class AttackController : MonoBehaviour, IDamageSender
 {
+    public bool canCombo = false;
+    public int currentCombo = 0;
+
     public LayerMask m_LayerMask;
     public float range = 1;
     public float size = 1;
@@ -14,6 +17,14 @@ public class AttackController : MonoBehaviour
         get
         {
             return transform.position + (transform.forward * size/2) + (transform.up * height);
+        }
+    }
+
+    public bool Stunable
+    {
+        get
+        {
+            return currentCombo != 0;
         }
     }
 
@@ -33,8 +44,15 @@ public class AttackController : MonoBehaviour
 
                 var flick = enemyHit.transform.GetComponentInChildren<IFlicker<Color>>();
                 if (flick != null) flick.Flicker(Color.red);
+
+                iDamagable.TakeDamage(1, this);
             }
         }
+    }
+
+    public void SetComboState(bool state)
+    {
+        canCombo = state;
     }
 
     private void OnDrawGizmos()
@@ -45,4 +63,7 @@ public class AttackController : MonoBehaviour
     }
 }
 
-public interface IDamagable { }
+public interface IDamagable
+{
+    void TakeDamage(int i, IDamageSender sender);
+}

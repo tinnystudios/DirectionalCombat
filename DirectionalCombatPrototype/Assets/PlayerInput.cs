@@ -58,7 +58,7 @@ public static class PlayerInput
         }
     }
 
-    public static bool RightTriggerUp
+    public static bool TargetButtonUp
     {
         get
         {

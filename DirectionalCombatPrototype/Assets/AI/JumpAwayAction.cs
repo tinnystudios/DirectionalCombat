@@ -10,12 +10,13 @@ public class JumpAwayAction : CoolDownAction
 
     public AnimationCurve m_JumpCurve = null;
     public AnimationCurve m_DodgeCurve = null;
+    public bool m_IsDone = false;
 
     public override bool IsDone
     {
         get
         {
-            return DistToTarget > m_Range;
+            return DistToTarget > m_Range | m_IsDone;
         }
     }
 
@@ -29,8 +30,13 @@ public class JumpAwayAction : CoolDownAction
         newPosition.y = height;
 
         this.MoveToPosition(transform, newPosition, duration, m_JumpCurve, m_DodgeCurve);
+        StartCoolDown();
     }
 
+    public override void Reset()
+    {
+        base.Reset();
+    }
 }
 
 

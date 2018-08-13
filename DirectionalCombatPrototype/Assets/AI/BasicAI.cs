@@ -22,7 +22,7 @@ public class BasicAI : MonoBehaviour, IStunable, IPushable, ITargetable {
     public BasicSensor m_Sensor;
 
     private bool mStunned = false;
-
+    public float m_StunDuration = 2;
     private void Awake()
     {
         var actions = GetComponentsInChildren<AIAction>();
@@ -34,8 +34,10 @@ public class BasicAI : MonoBehaviour, IStunable, IPushable, ITargetable {
 
     IEnumerator ProcessUpdate()
     {
+        Debug.Log("Start process update");
         while (true)
         {
+
             m_Sensor.ProcessSensor();
 
             if (!m_Sensor.SeenPlayer)
@@ -52,7 +54,7 @@ public class BasicAI : MonoBehaviour, IStunable, IPushable, ITargetable {
 
             var actions = m_Planner.Plan(mGoalState, this);
             m_CurrentPlan = actions;
-
+                        
             foreach (var action in actions)
             {
                 while (!action.IsDone)
@@ -68,8 +70,13 @@ public class BasicAI : MonoBehaviour, IStunable, IPushable, ITargetable {
                 }
 
                 //Delay until next action
-                yield return new WaitForSeconds(action.PerformCost);
+                if (action.PerformCost > 0)
+                {
+                    Debug.Log("Wait for: " + action.GetType() + " : " + action.PerformCost);
+                    yield return new WaitForSeconds(action.PerformCost);
+                }
             }
+            
 
             //If you have already detected player
             if (actions.Count == 0)
@@ -89,24 +96,23 @@ public class BasicAI : MonoBehaviour, IStunable, IPushable, ITargetable {
             mGoalState = m_CalmState;
     }
 
-    public void Stun()
+    public void Stun(float time)
     {
         StopAllCoroutines();
-        StartCoroutine(StunCoolDown());
+        StartCoroutine(StunCoolDown(time));
     }
 
-    IEnumerator StunCoolDown()
+    IEnumerator StunCoolDown(float time)
     {
         mStunned = true;
-        yield return new WaitForSeconds(1);
+        yield return new WaitForSeconds(time);
         mStunned = false;
-
         StartCoroutine(ProcessUpdate());
     }
 
-    public void Push()
+    public void Push(Vector3 dir, float force)
     {
-        //transform.position += character.transform.forward * 2;
+        transform.position += dir * force;
     }
 
 }

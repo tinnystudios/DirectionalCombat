@@ -8,10 +8,16 @@ public class MeshColorModifer : MonoBehaviour, IFlicker<Color>
     private Color cachedColor;
     private Material m_Material;
 
+    private Renderer[] m_Renderers;
+    private Dictionary<Material, Color> mMatLookUp = new Dictionary<Material, Color>();
+
     private void Awake()
     {
-        m_Material = m_Renderer.material;
-        cachedColor = m_Material.color;
+        m_Renderers = GetComponentsInChildren<Renderer>();
+        foreach (var rend in m_Renderers)
+        {
+            mMatLookUp.Add(rend.material, rend.material.color);
+        }
     }
 
     public void Flicker(Color color)
@@ -21,9 +27,18 @@ public class MeshColorModifer : MonoBehaviour, IFlicker<Color>
 
     IEnumerator Flick(Color color)
     {
-        m_Material.color = color;
+        foreach (var mat in mMatLookUp)
+        {
+            mat.Key.color = color;
+        }
+
         yield return new WaitForSeconds(0.2F);
-        m_Material.color = cachedColor;
+
+        foreach (var mat in mMatLookUp)
+        {
+            mat.Key.color = mat.Value;
+        }
+
     }
 }
 
