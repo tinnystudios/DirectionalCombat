@@ -25,6 +25,9 @@ public class BasicAI : MonoBehaviour, IStunable, IPushable, ITargetable {
     public float m_StunDuration = 2;
     private void Awake()
     {
+        if (m_AggressiveState == null)
+            return;
+
         var actions = GetComponentsInChildren<AIAction>();
         foreach (var action in actions) { action.SetTarget(m_Target); }
         m_Planner = new Planner();
@@ -34,7 +37,8 @@ public class BasicAI : MonoBehaviour, IStunable, IPushable, ITargetable {
 
     IEnumerator ProcessUpdate()
     {
-        Debug.Log("Start process update");
+        if (m_AggressiveState == null) yield break;
+
         while (true)
         {
 
